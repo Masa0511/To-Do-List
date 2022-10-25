@@ -1,0 +1,15 @@
+{% extends 'admin/base.html' %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-scheme: light:
+      --primary: #00FF00;
+      --secondary: #00FF00;
+      --link-fg: #00FF00;
+      --link-selected-fg: #00FF00;
+    }
+  }
+</style>
+{% endblock %}

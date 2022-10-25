@@ -1,0 +1,143 @@
+{% extends 'to_do_list/base.html' %}
+{% load number_of_days %}
+{% load static %}
+
+{% block content %}
+<div class="main">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12 col-xs-12 col-md-6">
+        <h2>タスク登録</h2>
+          <form method="POST" enctype='multipart/form-data'>
+            {% csrf_token %}
+            <table class="table">
+              {{ form.as_table }}
+            </table>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-primary" type="submit">作成</button>
+            </div>
+          </form>
+      </div>
+
+      <div class="col-sm-12 col-xs-12 col-md-6">
+        <h2>未完了タスク(締め切り後)</h2>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">超過日数</th>
+              <th scope="col">締切日</th>
+              <th scope="col">タスク</th>
+              <th scope="col">削除</th>
+              <th scope="col">編集</th>
+            </tr>
+            {% for item in after_deadline_task %}
+            <tr>
+              <td><a type="button" class="btn btn-outline-primary btn-sm" href="{% url 'condition' item.id %}">完了</a></td>
+              <td>{{ today | after_deadline:item }}日</td>
+              <td>{{ item.deadline }}</td>
+              <td>{{ item.task }}</td>
+              <td><a type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#delete-Modal-{{ item.pk }}">削除</a></td>
+              {% include 'to_do_list/delete.html' %}
+              <td><a type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#update-Modal-{{ item.pk }}">編集</a></td>
+              {% include 'to_do_list/update.html' %}
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      
+
+        <h2>未完了タスク</h2>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">残り日数</th>
+              <th scope="col">締切日</th>
+              <th scope="col">タスク</th>
+              <th scope="col">削除</th>
+              <th scope="col">編集</th>
+            </tr>
+            {% for item in incomplete_task %}
+            <tr>
+              <td><a type="button" class="btn btn-outline-primary btn-sm" href="{% url 'condition' item.id %}">完了</a></td>
+              <td>{{ item | days_remaining:today }}日</td>
+              <td>{{ item.deadline }}</td>
+              <td>{{ item.task }}</td>
+              <td><a type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#delete-Modal-{{ item.pk }}">削除</a></td>
+              {% include 'to_do_list/delete.html' %}
+              <td><a type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#update-Modal-{{ item.pk }}">編集</a></td>
+              {% include 'to_do_list/update.html' %}
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+
+        <h2>完了タスク</h2>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">締切日</th>
+              <th scope="col">タスク</th>
+              <th scope="col">削除</th>
+            </tr>
+            {% for item in complete_task %}
+            <tr>
+              <td><a type="button" class="btn btn-outline-primary btn-sm" href="{% url 'condition' item.id %}">未完了</a></td>
+              <td>{{ item.deadline }}</td>
+              <td>{{ item.task }}</td>
+              <td><a type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#delete-Modal-{{ item.pk }}">削除</a></td>
+              {% include 'to_do_list/delete.html' %}
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>  
+
+      {% comment %} 
+      <div class="row">
+       <div class="col-md-6">
+        <div style="width:500px;height:500px;">
+          <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+        <script>
+          const ctx = document.getElementById('myChart');
+          const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['期限前未完了', '期限後未完了'],
+              datasets: [{
+                data: {{ number_of_task }},
+                backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                ],
+                borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                yAxes: [
+                {
+                  ticks: {
+                    min: 0,
+                    stepSize: 1,
+                  }
+                }
+                ]
+              }
+            }
+          });
+        </script>
+      </div>
+      {% endcomment %}   
+    </div>
+  </div>
+</div>
+{% endblock %}
+
